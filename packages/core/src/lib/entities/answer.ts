@@ -1,24 +1,31 @@
 import { z } from 'zod';
-import { v4 as uuid } from 'uuid';
+
+import { CustomNumber, CustomString, Tagged, UUID } from '../types';
+
+export type AnswerId = Tagged<'AnswerId', UUID>;
 
 const createAnswerDtoParser = z.object({
-  title: z.string(),
-  points: z.preprocess((value) => Number(value), z.number()),
+  title: CustomString.rangeParser(1, 500),
+  points: z.preprocess(
+    (value) => Number(value),
+    CustomNumber.rangeParser(0, 1000)
+  ),
 });
 
 export type CreateAnswerDto = z.infer<typeof createAnswerDtoParser>;
 
 const answerParser = createAnswerDtoParser.merge(
   z.object({
-    id: z.string(),
+    id: UUID.parser<AnswerId>(),
   })
 );
 
-export type Answer = z.infer<typeof answerParser>;
+export type Answer = Tagged<'Answer', z.infer<typeof answerParser>>;
 
-const create = (dto: CreateAnswerDto, id = uuid()): Answer => ({
-  id,
-  ...dto,
-});
+const create = (dto: CreateAnswerDto, id = UUID.generate<AnswerId>()): Answer =>
+  Tagged.tag('Answer', {
+    id,
+    ...dto,
+  });
 
 export { create, answerParser, createAnswerDtoParser };

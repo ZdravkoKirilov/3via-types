@@ -53,7 +53,7 @@ let questions: QuestionEntity.Question[] = [
       },
     ],
   },
-];
+] as QuestionEntity.Question[];
 
 @Injectable()
 export class QuestionsService {

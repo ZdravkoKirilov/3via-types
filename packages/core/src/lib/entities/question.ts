@@ -1,40 +1,47 @@
 import { z } from 'zod';
-import { v4 as uuid } from 'uuid';
 
 import * as AnswerEntity from './answer';
 import { moveArrayItem } from '../helpers';
+import { CustomString, Tagged, UUID } from '../types';
 
 const createQuestionDtoParser = z.object({
-  title: z.string(),
-  hint: z.string().optional(),
+  title: CustomString.rangeParser(1, 500),
+  hint: CustomString.rangeParser(5, 600),
 });
+
+export type QuestionId = Tagged<'QuestionId', UUID>;
 
 export type CreateQuestionDto = z.infer<typeof createQuestionDtoParser>;
 
 const questionParser = z
   .object({
-    id: z.string(),
+    id: UUID.parser<QuestionId>(),
     answers: z.array(AnswerEntity.answerParser),
   })
   .merge(createQuestionDtoParser);
 
-export type Question = z.infer<typeof questionParser>;
+export type Question = Tagged<'Question', z.infer<typeof questionParser>>;
 
-const create = (dto: CreateQuestionDto, id = uuid()): Question => ({
-  ...dto,
-  id,
-  answers: [],
-});
+const create = (
+  dto: CreateQuestionDto,
+  id = UUID.generate<QuestionId>()
+): Question =>
+  Tagged.tag('Question', {
+    ...dto,
+    id,
+    answers: [],
+  });
 
 const update = (
   existingQuestion: Question,
   updatedQuestion: Question
-): Question => ({
-  id: existingQuestion.id,
-  title: updatedQuestion.title,
-  hint: updatedQuestion.hint,
-  answers: updatedQuestion.answers,
-});
+): Question =>
+  Tagged.tag('Question', {
+    id: existingQuestion.id,
+    title: updatedQuestion.title,
+    hint: updatedQuestion.hint,
+    answers: updatedQuestion.answers,
+  });
 
 const toEntity = (source: unknown) => {
   return questionParser.safeParse(source);
@@ -126,3 +133,17 @@ export {
   moveAnswer,
   moveQuestion,
 };
+
+class John {
+  constructor(public age: number) {}
+}
+
+class Jean {
+  constructor(public age: number) {}
+}
+
+const saveJohn = (params: John) => params;
+
+const testData = new Jean(5);
+
+saveJohn(testData);
