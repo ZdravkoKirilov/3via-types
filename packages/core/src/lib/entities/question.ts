@@ -1,3 +1,16 @@
+/*
+
+This file deals with the "Question" entity which is essential to any Quiz. It
+contains all business logic related to that entity.
+
+It contains parsers and types for essential DTOs for creation / entity serialization / updates.
+It contains different methods for other Question-mutating operations like:
+
+- updating the Question entity itself
+- adding / removing / reordering Answers
+
+*/
+
 import { z } from 'zod';
 
 import * as AnswerEntity from './answer';
