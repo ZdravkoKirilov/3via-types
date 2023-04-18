@@ -133,17 +133,3 @@ export {
   moveAnswer,
   moveQuestion,
 };
-
-class John {
-  constructor(public age: number) {}
-}
-
-class Jean {
-  constructor(public age: number) {}
-}
-
-const saveJohn = (params: John) => params;
-
-const testData = new Jean(5);
-
-saveJohn(testData);
